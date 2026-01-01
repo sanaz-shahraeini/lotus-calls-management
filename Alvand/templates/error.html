@@ -1,0 +1,1939 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load errortags %}
+
+{% block head_extra %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{# Uses app.css from base.html #}
+
+
+<style>
+    /* Shared variables, toggle, and layout moved to shared CSS files */
+
+    @media (max-width: 768px) {
+        .main-content {
+            margin-right: 0;
+            margin-left: 0;
+            width: 100%;
+        }
+    }
+
+    .filter-section {
+        background-color: var(--card-bg);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .filter-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 188, 212, 0.15);
+    }
+
+    .btn {
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        min-height: 44px;
+        font-size: 0.95rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 188, 212, 0.4);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--secondary-color) 0%, rgba(255, 255, 255, 0.9) 100%);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 188, 212, 0.3);
+    }
+
+    /* Compact Filter Controls - allow wrapping on smaller screens */
+    .filter-controls-single-line {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0.5rem 0;
+        width: 100%;
+    }
+
+    /* Compact Input Fields */
+    .input-field-compact {
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        transition: all 0.2s;
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-size: 0.875rem;
+        min-width: 140px;
+        width: 160px;
+        height: 36px;
+        flex-shrink: 0;
+    }
+
+    .search-compact {
+        min-width: 120px;
+        width: 120px;
+    }
+
+    .input-field-compact:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
+        outline: none;
+    }
+
+    /* Compact Buttons */
+    .btn-compact {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        text-decoration: none;
+        height: 36px;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    .btn-compact.btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        min-width: 60px;
+    }
+
+    .sort-btn-compact {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 36px;
+        width: 36px;
+        flex-shrink: 0;
+        color: var(--text-color);
+    }
+
+    .sort-btn-compact:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    /* Compact Pagination - clean minimal pill */
+    .pagination-compact {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        flex-shrink: 0;
+        height: 38px;
+    }
+
+    .nav-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        border: none;
+        background: transparent;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.18s ease;
+        font-size: 0.75rem;
+    }
+
+    .nav-btn:hover:not(.disabled) {
+        background: var(--primary-color);
+        color: #ffffff;
+        border-color: var(--primary-color);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 188, 212, 0.35);
+    }
+
+    .nav-btn.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    .page-info {
+        font-size: 0.78rem;
+        color: var(--text-color);
+        font-weight: 500;
+        padding: 0 0.5rem;
+        white-space: nowrap;
+        min-width: 46px;
+        text-align: center;
+    }
+
+    /* Compact Excel Button */
+    .excel-btn-compact {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        height: 36px;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+        white-space: nowrap;
+        cursor: pointer;
+        min-width: 70px;
+        box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+    }
+
+    .excel-btn-compact:hover {
+        background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 188, 212, 0.4);
+    }
+
+    /* Filter Controls Container */
+    .filter-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .filter-left {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .filter-right {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .date-filter-group {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        flex-shrink: 0;
+    }
+
+    .search-group {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        flex-shrink: 0;
+    }
+
+    /* Enhanced Excel Button */
+    .excel-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        padding: 0.875rem 1.75rem;
+        font-weight: 600;
+        box-shadow: 0 4px 16px rgba(40, 167, 69, 0.25);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 0.75rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        min-height: 44px;
+    }
+
+    .excel-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .excel-btn:hover::before {
+        left: 100%;
+    }
+
+    .excel-btn:hover {
+        background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    }
+
+    .excel-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .excel-btn i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .excel-btn:hover i {
+        transform: scale(1.1);
+    }
+
+    .input-field {
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        transition: all 0.2s;
+    }
+
+    .input-field:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+        /* Lotus Aqua with opacity */
+        outline: none;
+    }
+
+    .table-container {
+        background: var(--card-bg);
+        border-radius: 0.75rem;
+        box-shadow: var(--card-shadow);
+        overflow-x: auto;
+        border: 1px solid var(--border-color);
+    }
+
+    .table-modern {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 650px;
+    }
+
+    .table-modern th {
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        padding: 1rem;
+        font-weight: 600;
+        text-align: center !important;
+        border-bottom: 2px solid var(--border-color);
+        direction: ltr;
+    }
+
+    .table-modern td {
+        padding: 1rem;
+        text-align: center !important;
+        border-bottom: 1px solid var(--border-color);
+        max-width: 200px; /* محدود کردن عرض ستون‌ها */
+        word-wrap: break-word;
+        position: relative;
+        direction: ltr;
+    }
+
+ 
+
+    /* استایل برای ستون‌های متن طولانی */
+    .text-cell {
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+        max-width: 200px;
+    }
+    
+    /* Row hover effect */
+    .table-modern tbody tr:hover td {
+        background-color: var(--hover-color) !important;
+        color: var(--primary-color) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Dark mode specific hover styles */
+    html.dark .table-modern tbody tr:hover td {
+        background-color: rgba(0, 188, 212, 0.1) !important;
+        color: #ffffff !important;
+    }
+
+    .text-cell:hover::after {
+        opacity: 1;
+        transform: translateY(-50%) scale(1.1);
+        color: var(--primary-hover);
+    }
+
+    /* Modals rely on shared-modals.css */
+
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .close:hover { opacity: 0.8; }
+
+    .excel-btn:hover {
+        background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    }
+
+    .excel-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .excel-btn i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .excel-btn:hover i {
+        transform: scale(1.1);
+    }
+
+    .modal-section-title {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        border-bottom: 2px solid #e0f7fa;
+        padding-bottom: 0.5rem;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        border-radius: 18px;
+        width: 70vw;
+        max-width: 900px;
+        min-width: 500px;
+    }
+
+    .modal-body {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        overflow: hidden;
+    }
+
+    .modal-section-content {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 255, 0.96));
+        color: var(--text-color);
+        padding: 1.75rem 1.5rem;
+        border-radius: 16px;
+        border-right: 4px solid var(--primary-color);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        font-size: 1rem;
+        line-height: 1.9;
+        text-align: left;
+        direction: ltr;
+        max-height: 60vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        word-break: break-word;
+        white-space: pre-line;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.06);
+    }
+
+    .modal-section-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-section-content::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.04);
+        border-radius: 999px;
+    }
+
+    .modal-section-content::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--primary-color), var(--primary-hover));
+        border-radius: 999px;
+    }
+
+    /* بهبود نمایش متن‌های طولانی */
+    .modal-section-content p {
+        margin-bottom: 1.5rem;
+        text-indent: 0;
+        padding: 0.5rem 0;
+    }
+
+    .modal-section-content ul {
+        margin: 1.5rem 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .modal-section-content li {
+        margin-bottom: 1.2rem;
+        position: relative;
+        padding: 0.8rem 1.5rem;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--text-color);
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-color);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .modal-section-content li:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: var(--text-color) !important;
+        transform: translateX(5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-section-content li:before {
+        content: none;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: var(--hover-color);
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .pagination-btn {
+        padding: 0.625rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        min-height: 40px;
+        font-size: 0.9rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pagination-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.4s ease;
+    }
+
+    .pagination-btn:hover::before {
+        left: 100%;
+    }
+
+    .pagination-btn:not(.opacity-50):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 188, 212, 0.2);
+    }
+
+    .sort-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        min-width: 44px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .sort-btn:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 188, 212, 0.3);
+    }
+
+    .sort-btn:hover i {
+        color: white !important;
+        transform: scale(1.1);
+    }
+
+    @media print {
+
+        .filter-section,
+        .sort-btn,
+        .pagination {
+            display: none !important;
+        }
+
+        .table-container {
+            box-shadow: none;
+            border: none;
+        }
+
+        .table-modern th,
+        .table-modern td {
+            border: 1px solid #000;
+        }
+    }
+
+    /* Enhanced Mobile Responsive Styles for Compact Layout */
+    @media (max-width: 1200px) {
+        .input-field-compact {
+            min-width: 100px;
+            width: 100px;
+        }
+        
+        .search-compact {
+            min-width: 110px;
+            width: 110px;
+        }
+        
+        .excel-btn-compact {
+            min-width: 60px;
+        }
+        
+        .page-info {
+            min-width: 35px;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .filter-controls-single-line {
+            gap: 0.375rem;
+        }
+        
+        .input-field-compact {
+            min-width: 90px;
+            width: 90px;
+            font-size: 0.8rem;
+        }
+        
+        .search-compact {
+            min-width: 100px;
+            width: 100px;
+        }
+        
+        .btn-compact {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
+            min-width: 50px;
+        }
+        
+        .excel-btn-compact {
+            min-width: 55px;
+            font-size: 0.8rem;
+        }
+
+        .filter-controls {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1.5rem;
+        }
+
+        .filter-left {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-right {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .filter-section {
+            padding: 1rem 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-controls-single-line {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        
+        .input-field-compact {
+            min-width: 100%;
+            width: 100%;
+        }
+        
+        .search-compact {
+            min-width: 100%;
+            width: 100%;
+        }
+        
+        .btn-compact {
+            width: 100%;
+            min-width: 100%;
+        }
+        
+        .excel-btn-compact {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .filter-controls {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        #filterForm {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            row-gap: 0.5rem;
+        }
+
+        /* All forms (filter + export buttons) take full row; small controls share rows */
+        .filter-controls-single-line > form {
+            width: 100%;
+        }
+
+        .date-filter-group,
+        .search-group {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 1rem;
+        }
+
+        .date-filter-group {
+            gap: 1rem;
+        }
+
+        .search-group {
+            gap: 0.75rem;
+        }
+
+        .input-field {
+            width: 100%;
+            min-height: 44px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            min-height: 44px;
+            font-size: 1rem;
+            justify-content: center;
+        }
+
+        .excel-btn {
+            padding: 1rem 1.5rem;
+            justify-content: center;
+        }
+
+        .pagination {
+            width: 100%;
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        .sort-btn {
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-container {
+            margin: 0;
+            width: 100%;
+            border-radius: 0.75rem;
+            overflow-x: visible;
+        }
+
+        /* Card-style rows instead of wide table */
+        .table-modern {
+            width: 100%;
+            min-width: 0;
+            border-spacing: 0;
+        }
+
+        .table-modern thead {
+            display: none;
+        }
+
+        .table-modern tbody tr {
+            display: block;
+            margin-bottom: 0.75rem;
+            border-radius: 0.75rem;
+            background: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);
+            overflow: hidden;
+        }
+
+        .table-modern th,
+        .table-modern td {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .table-modern td {
+            display: flex;
+            flex-direction: row-reverse; /* label on right, value on left */
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .table-modern td:last-child {
+            border-bottom: none;
+        }
+
+        .table-modern td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-left: 0.75rem;
+            white-space: nowrap;
+        }
+
+        /* On mobile card layout, disable row/cell hover highlight */
+        .table-modern tbody tr:hover {
+            background-color: transparent;
+        }
+
+        .table-modern .text-cell:hover,
+        .table-modern td:hover {
+            background-color: transparent !important;
+            color: inherit !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .filter-section {
+            padding: 1rem 0.75rem;
+        }
+
+        .filter-controls {
+            gap: 1rem;
+        }
+
+        .filter-controls-single-line {
+            align-items: stretch;
+        }
+
+        #filterForm {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .input-field-compact,
+        .search-compact {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .date-filter-group,
+        .search-group {
+            padding: 0.75rem;
+        }
+
+        .excel-btn {
+            padding: 0.875rem 1.25rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-compact,
+        .excel-btn-compact {
+            width: 100%;
+        }
+
+        .pagination-compact {
+            width: auto;
+            align-self: center;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .pagination span {
+            display: none;
+        }
+
+        .btn {
+            font-size: 0.95rem;
+        }
+    }
+
+    /* Dark mode enhancements for filter section */
+    .dark .filter-section {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(13, 27, 42, 0.8) 100%);
+        border-color: var(--border-color);
+    }
+
+    .dark .date-filter-group,
+    .dark .search-group {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--border-color);
+    }
+
+    .dark .excel-btn {
+        box-shadow: 0 4px 16px rgba(40, 167, 69, 0.15);
+    }
+
+    .dark .excel-btn:hover {
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.25);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .modal {
+            padding: 1rem;
+        }
+        .modal-content {
+            width: 95%;
+            max-width: 100%;
+            padding: 1.5rem;
+            max-height: 90vh;
+            margin: 1rem auto;
+        }
+        
+        .modal-section-content {
+            padding: 1.5rem;
+            font-size: 1rem;
+            text-align: left;
+            direction: ltr;
+            color: var(--text-color);
+        }
+        
+        .modal-section-content li {
+            padding: 0.6rem 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        
+        .modal-section-content li:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: var(--text-color) !important;
+        }
+        
+        .modal-section-content li:before {
+            width: 6px;
+            height: 6px;
+            font-size: 0;
+        }
+        
+        .table-modern td {
+            max-width: 150px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .modal {
+            padding: 0.5rem;
+        }
+        .modal-content {
+            width: 98%;
+            padding: 1.25rem;
+            max-height: 95vh;
+            margin: 0.5rem auto;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+        }
+        
+        .modal-section-title {
+            font-size: 1.1rem;
+        }
+        
+        .modal-section-content {
+            padding: 1rem;
+            font-size: 0.95rem;
+            text-align: left;
+            direction: ltr;
+            color: var(--text-color);
+        }
+        
+        .modal-section-content li {
+            padding: 0.5rem 0.8rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+        
+        .modal-section-content li:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: var(--text-color) !important;
+        }
+        
+        .modal-section-content li:before {
+            width: 6px;
+            height: 6px;
+            font-size: 0;
+        }
+    }
+
+    /* Dark mode specific styles */
+    [data-theme="dark"] .text-cell {
+        color: var(--text-color);
+    }
+
+    [data-theme="dark"] .text-cell:hover {
+        background-color: rgba(99, 102, 241, 0.2) !important;
+        color: #60a5fa !important;
+    }
+
+    /* Dark mode cards inside modal (supports both .dark class and data-theme="dark") */
+    .dark .modal-section-content,
+    [data-theme="dark"] .modal-section-content {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.75);
+    }
+
+    .dark .modal-section-content li,
+    [data-theme="dark"] .modal-section-content li {
+        background: rgba(15, 23, 42, 0.9);
+        border-left-color: var(--primary-color);
+        color: var(--text-color);
+    }
+
+    .dark .modal-section-content li:hover,
+    [data-theme="dark"] .modal-section-content li:hover {
+        /* در دارک مود، هاور اضافی نداشته باشد */
+        background: rgba(15, 23, 42, 0.9) !important;
+        color: var(--text-color) !important;
+        transform: none !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* Clean text styles to remove question marks */
+    .clean-text {
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+
+<div class="my-0 w-full">
+    <div class="w-full h-auto mt-1 mx-auto flex flex-col rtl">
+        <div class="filter-section">
+            <div class="filter-controls-single-line">
+                <!-- Compact form elements -->
+                <form id="filterForm" method="get" style="display: flex; gap: 10px; align-items: center;">
+                    <input id="dateFrom" data-jdp placeholder="از تاریخ" name="dateFrom" class="input-field-compact"
+                        value="{{ request.GET.dateFrom|default:'' }}" />
+                    <input id="dateTo" data-jdp placeholder="تا تاریخ" name="dateTo" class="input-field-compact"
+                        value="{{ request.GET.dateTo|default:'' }}" />
+                    <input type="search" id="search" name="search" placeholder="شماره خطا"
+                        class="input-field-compact search-compact" value="{{ request.GET.search|default:'' }}" 
+                        style="background-color: #fff; border: 2px solid #00BCD4; min-width: 150px;" />
+                    <button type="submit" id="applyFilterBtn" class="btn-compact btn-primary">
+                        <i class="fas fa-filter"></i>
+                        فیلتر
+                    </button>
+                </form>
+                    
+                <button id="up" class="sort-btn-compact">
+                    <i class="fa-regular fa-arrow-up"></i>
+                </button>
+
+                {% if pages %}
+                <div class="pagination-compact">
+                    <a href="{% if pages.has_next %}?p={{ pages.next_page_number }}{% if request.GET.dateFrom %}&dateFrom={{ request.GET.dateFrom }}{% endif %}{% if request.GET.dateTo %}&dateTo={{ request.GET.dateTo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% else %}#{% endif %}"
+                        class="nav-btn {% if not pages.has_next %}disabled{% endif %}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <span class="page-info">{{ pages.number }}/{{ pages.paginator.num_pages }}</span>
+                    <a href="{% if pages.has_previous %}?p={{ pages.previous_page_number }}{% if request.GET.dateFrom %}&dateFrom={{ request.GET.dateFrom }}{% endif %}{% if request.GET.dateTo %}&dateTo={{ request.GET.dateTo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% else %}#{% endif %}"
+                        class="nav-btn {% if not pages.has_previous %}disabled{% endif %}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <form method="get" action="{% url 'error_export' %}">
+                    {% if request.GET.dateFrom %}
+                        <input type="hidden" name="dateFrom" value="{{ request.GET.dateFrom }}">
+                    {% endif %}
+                    {% if request.GET.dateTo %}
+                        <input type="hidden" name="dateTo" value="{{ request.GET.dateTo }}">
+                    {% endif %}
+                    {% if request.GET.search %}
+                        <input type="hidden" name="search" value="{{ request.GET.search }}">
+                    {% endif %}
+                    <input type="hidden" name="format" value="excel">
+                    <button type="submit" class="excel-btn-compact">
+                        <i class="fas fa-file-excel"></i>
+                        دانلود اکسل 
+                    </button>
+                </form>
+                <form method="get" action="{% url 'error_export' %}">
+                    {% if request.GET.dateFrom %}
+                        <input type="hidden" name="dateFrom" value="{{ request.GET.dateFrom }}">
+                    {% endif %}
+                    {% if request.GET.dateTo %}
+                        <input type="hidden" name="dateTo" value="{{ request.GET.dateTo }}">
+                    {% endif %}
+                    {% if request.GET.search %}
+                        <input type="hidden" name="search" value="{{ request.GET.search }}">
+                    {% endif %}
+                    <input type="hidden" name="format" value="csv">
+                    <button type="submit" class="excel-btn-compact">
+                        <i class="fas fa-file-csv"></i>
+                        دانلود CSV
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id='table' class="table-modern">
+                <thead>
+                    <tr>
+                        <th>ردیف</th>
+                        <th>تاریخ</th>
+                        <th>ساعت</th>
+                        <th>شماره خطا</th>
+                        <th>عنوان خطا</th>
+                        <th>علت احتمالی</th>
+                        <th>راه حل پیشنهادی</th>
+                    </tr>
+                </thead>
+                <tbody id="errorsTable">
+                    {% if pages %}
+                    {% for fault in pages.object_list %}
+                    <tr>
+                        <td data-label="ردیف">{{ forloop.counter0|add:pages.start_index }}</td>
+                        <td data-label="تاریخ">{{ fault.persian_date|default:"تاریخ نامشخص" }}</td>
+                        <td data-label="ساعت">{{ fault.persian_time|default:"زمان نامشخص" }}</td>
+                        <td data-label="شماره خطا">{{ fault.errorcode }}</td>
+                        <td data-label="عنوان خطا" class="text-cell text-center" data-type="errormessage" data-content="{{ fault.errormessage|default:'عنوان خطا مشخص نیست'|escape }}" data-code="{{ fault.errorcode|escape }}" title="کلیک کنید تا عنوان کامل خطا را مشاهده کنید">
+                            <span class="clean-text">{{ fault.errormessage|default:"مشخص نیست" }}</span>
+                        </td>
+                        <td data-label="علت احتمالی" class="text-cell text-center" data-type="probablecause" data-content="{{ fault.probablecause|default:'علت احتمالی مشخص نیست'|escape }}" data-code="{{ fault.errorcode|escape }}" title="کلیک کنید تا علت کامل را مشاهده کنید">
+                            <span class="clean-text">{{ fault.probablecause|default:"مشخص نیست" }}</span>
+                        </td>
+                        <td data-label="راه حل پیشنهادی" class="text-cell" data-type="solution" data-content="{{ fault.solution|default:'راه حل پیشنهادی موجود نیست'|escape }}" data-code="{{ fault.errorcode|escape }}" title="کلیک کنید تا راه حل کامل را مشاهده کنید">
+                            <span class="clean-text">{{ fault.solution|default:"موجود نیست" }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for displaying full text -->
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">جزئیات خطا</h3>
+            <span class="close" onclick="closeModal()"></span>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <div class="modal-section-content" id="modalContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'js/jquery.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        // Check if jalaliDatepicker is available (it should be loaded from base.html)
+        if (typeof jalaliDatepicker !== 'undefined') {
+            console.log('Jalali Datepicker library loaded successfully');
+
+            // Initialize date picker with proper format
+            try {
+                const datePickerOptions = {
+                    minDate: "attr",
+                    maxDate: "today",
+                    hideAfterChange: true,
+                    autoHide: true,
+                    showTodayBtn: true,
+                    showEmptyBtn: true,
+                    persianDigits: true,
+                    time: false,
+                    format: 'YYYY/MM/DD',
+                    autoClose: true,
+                    topSpace: 10,
+                    bottomSpace: 30,
+                    dayRendering(opt, input) {
+                        return {
+                            isHollyDay: opt.day == 1
+                        }
+                    },
+                    onSelect: function(formattedDate, dateObject, inputElement) {
+                        if (inputElement) {
+                            inputElement.value = formattedDate;
+                        }
+                    }
+                };
+                
+                // Initialize date picker
+                jalaliDatepicker.startWatch(datePickerOptions);
+                console.log('Jalali Datepicker initialized successfully with format YYYY/MM/DD');
+                
+                // Add form submission handler
+                $('form#filterForm').on('submit', function(e) {
+                    const $dateFrom = $('#dateFrom');
+                    const $dateTo = $('#dateTo');
+                    
+                    if ($dateFrom.val() && $dateTo.val()) {
+                        try {
+                            // Ensure dates are in YYYY/MM/DD format
+                            const formatDate = (dateStr) => {
+                                return dateStr.replace(/-/g, '/');
+                            };
+                            
+                            $dateFrom.val(formatDate($dateFrom.val()));
+                            $dateTo.val(formatDate($dateTo.val()));
+                            
+                        } catch (error) {
+                            console.error('Error formatting dates:', error);
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing Jalali Datepicker:', error);
+            }
+        } else {
+            console.error('Jalali Datepicker library not found - it should be loaded from base.html');
+
+            // Try to load it manually if not available
+            const script = document.createElement('script');
+            script.src = "{% static 'dist/jalalidatepicker.js' %}";
+            script.onload = function () {
+                console.log('Jalali Datepicker loaded manually');
+                const datePickerOptions = {
+                    minDate: "attr",
+                    maxDate: "today",
+                    hideAfterChange: true,
+                    autoHide: true,
+                    showTodayBtn: true,
+                    showEmptyBtn: true,
+                    persianDigits: true,
+                    time: false,
+                    format: 'YYYY/MM/DD',
+                    autoClose: true,
+                    topSpace: 10,
+                    bottomSpace: 30,
+                    dayRendering(opt, input) {
+                        return {
+                            isHollyDay: opt.day == 1
+                        }
+                    },
+                    onSelect: function(formattedDate, dateObject, inputElement) {
+                        if (inputElement) {
+                            inputElement.value = formattedDate;
+                        }
+                    }
+                };
+                
+                jalaliDatepicker.startWatch(datePickerOptions);
+                
+                // Add form submission handler for fallback as well
+                $('form#filterForm').on('submit', function(e) {
+                    const $dateFrom = $('#dateFrom');
+                    const $dateTo = $('#dateTo');
+                    
+                    if ($dateFrom.val() && $dateTo.val()) {
+                        try {
+                            const formatDate = (dateStr) => {
+                                return dateStr.replace(/-/g, '/');
+                            };
+                            
+                            $dateFrom.val(formatDate($dateFrom.val()));
+                            $dateTo.val(formatDate($dateTo.val()));
+                            
+                        } catch (error) {
+                            console.error('Error formatting dates (fallback):', error);
+                        }
+                    }
+                });
+            };
+            document.head.appendChild(script);
+        }
+    });
+</script>
+<script>
+    // Modal functions
+    function showDetailModal(type, content, errorCode) {
+        console.log('Opening modal for:', {type, errorCode});
+        const modal = document.getElementById('detailModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+
+        if (!modal) {
+            console.error('Modal element not found!');
+            return;
+        }
+        if (!modalTitle || !modalContent) {
+            console.error('Modal content elements not found!');
+            return;
+        }
+
+        // Set modal content based on type
+        const titles = {
+            'errormessage': 'عنوان خطا',
+            'probablecause': 'علت احتمالی',
+            'solution': 'راه حل پیشنهادی',
+            'default': 'جزئیات'
+        };
+        
+        const title = titles[type] || titles['default'];
+        
+        modalTitle.textContent = `خطای ${errorCode} - ${title}`;
+        // Use formatted HTML for better, structured display
+        const rawText = (content || 'محتوا موجود نیست').replace(/\?/g, '');
+        modalContent.innerHTML = formatTextForModal(rawText);
+        
+        // Show the modal
+        modal.style.display = 'flex';
+        // Force reflow
+        void modal.offsetHeight;
+        // Add show class
+        modal.classList.add('show');
+        
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+        
+        console.log('Modal should be visible now');
+    }
+    
+    // تابع برای فرمت کردن متن
+    function formatTextForModal(text) {
+        if (!text) {
+            return '<p style="padding: 1rem;">محتوا موجود نیست</p>';
+        }
+
+        // ابتدا بر اساس خط جدید تقسیم کن تا هر خط به یک آیتم مستقل تبدیل شود
+        let lines = text.split(/[\r\n]+/).map(l => l.trim()).filter(l => l.length > 0);
+
+        // اگر فقط یک خط داشتیم، دوباره بر اساس نقطه/علامت تعجب/سؤال تقسیم کنیم
+        if (lines.length <= 1) {
+            lines = text.split(/[.!?]/).map(l => l.trim()).filter(l => l.length > 0);
+        }
+
+        // اگر باز هم فقط یک مورد بود، همان را در یک پاراگراف ساده برگردان
+        if (lines.length <= 1) {
+            const clean = lines[0] || text;
+            return `<p style="padding: 1rem; background: rgba(255, 255, 255, 0.1); color: var(--text-color); border-radius: 8px; border-left: 4px solid var(--primary-color);">${clean}</p>`;
+        }
+
+        // تبدیل به لیست زیبا
+        let formattedText = '<ul>';
+        lines.forEach((item) => {
+            let cleanSentence = item
+                .replace(/^[,\.\s]+/, '')
+                .replace(/[,\.\s]+$/, '');
+            if (cleanSentence.length > 0) {
+                formattedText += `<li>${cleanSentence}</li>`;
+            }
+        });
+        formattedText += '</ul>';
+
+        return formattedText;
+    }
+    
+    function closeModal() {
+        const modal = document.getElementById('detailModal');
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+            document.body.style.overflow = 'auto';
+        }
+    }
+    
+    
+    
+    // Initialize modal state and event listeners
+    function initModal() {
+        // Initialize modal
+        const modal = document.getElementById('detailModal');
+        if (!modal) {
+            console.error('Modal element not found!');
+            return;
+        }
+        
+        // Hide modal initially
+        modal.style.display = 'none';
+        
+        // Add close button handler
+        const closeBtn = modal.querySelector('.close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeModal();
+            });
+        }
+        
+        // Close modal when clicking outside content
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+    }
+    
+    // Initialize table cell click handlers
+    function initTableClickHandlers() {
+        // Add click handler for table cells using event delegation on the table container
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) {
+            tableContainer.addEventListener('click', function(e) {
+                const textCell = e.target.closest('.text-cell');
+                if (textCell) {
+                    e.preventDefault();
+                    const type = textCell.getAttribute('data-type') || 'errormessage';
+                    const content = textCell.getAttribute('data-content') || '';
+                    const code = textCell.getAttribute('data-code') || '';
+                    showDetailModal(type, content, code);
+                }
+            });
+        }
+    }
+    
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        initModal();
+        initTableClickHandlers();
+    });
+
+    // Initialize table and search functionality when document is ready
+    $(document).ready(function () {
+        // Initialize variables
+        let reversed = false;
+        const $table = $("#table");
+        const $searchInput = $("#search");
+        const $tableBody = $("#errorsTable");
+        const $filterForm = $("#filterForm");
+        const $applyFilterBtn = $("#applyFilterBtn");
+        let $tableRows = $table.find("tbody tr");
+        let $originalTableRows = $table.find("tbody tr"); // Keep reference to all original rows
+        let ajaxRequest = null; // Store current AJAX request for cancellation
+        
+        // Real-time filtering function using AJAX
+        function performRealTimeFilter() {
+            const searchValue = $("#search").val().trim();
+            const dateFrom = $("#dateFrom").val();
+            const dateTo = $("#dateTo").val();
+            
+            console.log("Real-time AJAX filtering with search:", searchValue);
+            
+            // Cancel previous AJAX request if it exists
+            if (ajaxRequest) {
+                ajaxRequest.abort();
+            }
+            
+            // If search is empty and no date filters, don't make AJAX call
+            if (!searchValue && !dateFrom && !dateTo) {
+                console.log("No filters applied, skipping AJAX call");
+                $searchInput.css('background-color', '#fff');
+                $searchInput.attr('title', 'جستجوی شماره خطا');
+                return;
+            }
+            
+            // Show loading indicator
+            $searchInput.css('background-color', '#fff3cd'); // Light yellow for loading
+            $searchInput.attr('title', 'در حال جستجو...');
+            
+            // Build URL parameters
+            const params = {};
+            if (searchValue) params.search = searchValue;
+            if (dateFrom) params.dateFrom = dateFrom;
+            if (dateTo) params.dateTo = dateTo;
+            
+            // Make AJAX request to search endpoint
+            ajaxRequest = $.ajax({
+                url: '{% url "error_search_ajax" %}',
+                method: 'GET',
+                data: params,
+                dataType: 'json',
+                success: function(response) {
+                    console.log("AJAX search successful:", response);
+                    
+                    if (response.success) {
+                        // Clear current table body
+                        $tableBody.empty();
+                        
+                        // Populate table with results
+                        if (response.results && response.results.length > 0) {
+                            response.results.forEach(function(record) {
+                                const row = `
+                                    <tr>
+                                        <td>${record.index}</td>
+                                        <td>${record.persian_date}</td>
+                                        <td>${record.persian_time}</td>
+                                        <td>${record.errorcode}</td>
+                                        <td class="text-cell text-center" data-type="errormessage" 
+                                            data-content="${escapeHtml(record.errormessage)}" 
+                                            data-code="${record.errorcode}" 
+                                            title="کلیک کنید تا عنوان کامل خطا را مشاهده کنید">
+                                            <span class="clean-text">${truncateText(record.errormessage, 50)}</span>
+                                        </td>
+                                        <td class="text-cell text-center" data-type="probablecause" 
+                                            data-content="${escapeHtml(record.probablecause)}" 
+                                            data-code="${record.errorcode}" 
+                                            title="کلیک کنید تا علت کامل را مشاهده کنید">
+                                            <span class="clean-text">${truncateText(record.probablecause, 50)}</span>
+                                        </td>
+                                        <td class="text-cell" data-type="solution" 
+                                            data-content="${escapeHtml(record.solution)}" 
+                                            data-code="${record.errorcode}" 
+                                            title="کلیک کنید تا راه حل کامل را مشاهده کنید">
+                                            <span class="clean-text">${truncateText(record.solution, 50)}</span>
+                                        </td>
+                                    </tr>
+                                `;
+                                $tableBody.append(row);
+                            });
+                            
+                            // Update visible rows reference
+                            $tableRows = $table.find("tbody tr");
+                            $originalTableRows = $tableRows;
+                            
+                            // Update pagination info
+                            updatePaginationInfo(response.count);
+                            
+                            // Success feedback
+                            $searchInput.css('background-color', '#d4edda'); // Light green for success
+                            $searchInput.attr('title', `${response.count} نتیجه پیدا شد`);
+                        } else {
+                            // No results found
+                            $tableBody.html(`
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 2rem; color: #666;">
+                                        نتیجه‌ای یافت نشد
+                                    </td>
+                                </tr>
+                            `);
+                            
+                            $searchInput.css('background-color', '#f8d7da'); // Light red for no results
+                            $searchInput.attr('title', 'نتیجه‌ای یافت نشد');
+                            
+                            updatePaginationInfo(0);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    if (status !== 'abort') {
+                        console.error("AJAX search error:", error);
+                        $searchInput.css('background-color', '#f8d7da'); // Light red for error
+                        $searchInput.attr('title', 'خطا در جستجو');
+                    }
+                },
+                complete: function() {
+                    ajaxRequest = null;
+                }
+            });
+        }
+        
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Helper function to truncate text
+        function truncateText(text, maxLength) {
+            if (!text) return 'مشخص نیست';
+            text = text.replace(/\?/g, '').replace(/\s+/g, ' ').trim();
+            if (text.length > maxLength) {
+                let truncated = text.substring(0, maxLength);
+                let lastSpace = truncated.lastIndexOf(' ');
+                if (lastSpace > maxLength * 0.7) {
+                    truncated = truncated.substring(0, lastSpace);
+                }
+                return truncated;
+            }
+            return text;
+        }
+        
+        // Debounced filtering function
+        let filterTimeout;
+        function debouncedFilter() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(performRealTimeFilter, 300); // 300ms delay
+        }
+        
+        // Update pagination info based on visible rows
+        function updatePaginationInfo(count) {
+            const pageInfo = $('.page-info');
+            if (pageInfo.length) {
+                if (count !== undefined) {
+                    pageInfo.text(`${count} نتیجه`);
+                } else {
+                    const visibleRows = $table.find("tbody tr:visible").length;
+                    pageInfo.text(`${visibleRows} نتیجه`);
+                }
+            }
+            
+            // Hide pagination controls when filtering
+            const paginationContainer = $('.pagination-compact');
+            if (paginationContainer.length) {
+                const searchValue = $("#search").val().trim();
+                if (searchValue) {
+                    // When filtering, hide pagination arrows
+                    paginationContainer.find('.nav-btn').hide();
+                    pageInfo.show();
+                } else {
+                    // When not filtering, show normal pagination
+                    paginationContainer.find('.nav-btn').show();
+                }
+            }
+        }
+        
+        // Handle filter form submission (for date filtering)
+        $filterForm.on("submit", function(e) {
+            e.preventDefault();
+            const dateFrom = $("#dateFrom").val();
+            const dateTo = $("#dateTo").val();
+            const searchValue = $("#search").val().trim();
+            
+            console.log("Form submitted");
+            console.log("DateFrom:", dateFrom);
+            console.log("DateTo:", dateTo);
+            console.log("Search:", searchValue);
+            
+            // If only search value is provided (no dates), use AJAX
+            if (searchValue && !dateFrom && !dateTo) {
+                console.log("Only search value provided, using AJAX");
+                performRealTimeFilter();
+                return false;
+            }
+            
+            // If dates are provided, validate them
+            if (dateFrom && dateTo) {
+                // Validate dates if needed
+                if (new Date(dateFrom) > new Date(dateTo)) {
+                    alert("تاریخ شروع نباید از تاریخ پایان بزرگتر باشد");
+                    return false;
+                }
+                
+                // For date filtering, we'll use server-side filtering
+                // Build URL with parameters
+                let url = new URL(window.location);
+                url.searchParams.set('dateFrom', dateFrom);
+                url.searchParams.set('dateTo', dateTo);
+                if (searchValue) {
+                    url.searchParams.set('search', searchValue);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                
+                // Redirect to the same page with filter parameters
+                window.location.href = url.toString();
+            } else if (searchValue) {
+                // Only search value, use AJAX
+                performRealTimeFilter();
+            }
+        });
+        
+        // Sort functionality
+        $("#up").on("click", function () {
+            const icon = $("#up i");
+            icon.toggleClass("fa-arrow-up fa-arrow-down");
+            
+            // Convert to array for sorting
+            const rows = $tableRows.get();
+            
+            // Toggle sort direction
+            if (reversed) {
+                $tableBody.append(rows);
+            } else {
+                $tableBody.append(rows.reverse());
+            }
+            
+            reversed = !reversed;
+            
+            // Update the rows reference after sorting
+            $tableRows = $table.find("tbody tr:visible");
+        });
+        
+        // Handle search input - real-time filtering
+        $searchInput.on({
+            'input keyup paste': function(e) {
+                const searchValue = $(this).val().trim();
+                console.log("Search input changed:", searchValue);
+                
+                // If search is cleared, reload the page to show original pagination
+                if (searchValue === '') {
+                    console.log("Search cleared, reloading page");
+                    // Remove search parameter from URL and reload
+                    const url = new URL(window.location);
+                    url.searchParams.delete('search');
+                    window.location.href = url.toString();
+                } else {
+                    debouncedFilter(); // Use debounced filtering for real-time updates
+                }
+            },
+            'keypress': function(e) {
+                if (e.which === 13) { // Enter key
+                    e.preventDefault();
+                    console.log("Enter key pressed - performing immediate filter");
+                    clearTimeout(filterTimeout); // Cancel debounced filter
+                    performRealTimeFilter(); // Immediate filter
+                }
+            },
+            'search': function() {
+                // This event fires when the user clicks the clear (x) button
+                console.log("Search cleared via X button");
+                const searchValue = $(this).val().trim();
+                if (searchValue === '') {
+                    // Reload page without search parameter
+                    const url = new URL(window.location);
+                    url.searchParams.delete('search');
+                    window.location.href = url.toString();
+                } else {
+                    debouncedFilter();
+                }
+            }
+        });
+        
+        // Initial setup
+        $tableRows = $table.find("tbody tr");
+        $originalTableRows = $table.find("tbody tr");
+        
+        // Initialize filtering if there's already a search value (from URL)
+        if ($searchInput.val()) {
+            console.log("Initializing with existing search value:", $searchInput.val());
+            performRealTimeFilter();
+        }
+
+        // Add toggle functionality for mobile view to show/hide columns
+        if (window.innerWidth <= 768) {
+            const tableHeaders = $(".table-modern th");
+            tableHeaders.each(function (index) {
+                $(this).click(function () {
+                    const columnIndex = index + 1;
+                    $(".table-modern td:nth-child(" + columnIndex + ")").toggle();
+                    $(this).toggleClass("active-column");
+                });
+            });
+        }
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        // پاک کردن علامت سوال و کوتاه کردن متن‌ها
+        function cleanAndTruncateText() {
+            $('.clean-text').each(function() {
+                let text = $(this).text();
+                if (text) {
+                    // Remove question marks and clean up extra spaces
+                    text = text.replace(/\?/g, '')
+                              .replace(/\s+/g, ' ')
+                              .trim();
+                    
+                    // Smart truncation without ellipsis
+                    let maxLength = 50;
+                    if (text.length > maxLength) {
+                        // Find the last complete word within the limit
+                        let truncated = text.substring(0, maxLength);
+                        let lastSpace = truncated.lastIndexOf(' ');
+                        if (lastSpace > maxLength * 0.7) { // If we can find a good break point
+                            truncated = truncated.substring(0, lastSpace);
+                        }
+                        text = truncated;
+                    }
+                    
+                    $(this).text(text);
+                }
+            });
+        }
+
+        // اجرای تابع پاک کردن علامت سوال و کوتاه کردن متن‌ها
+        cleanAndTruncateText();
+        
+        // Calendar positioning fixes for error page
+        function enhanceCalendarInputs() {
+            $('input[data-jdp]').each(function() {
+                const $input = $(this);
+                const $wrapper = $input.closest('.filter-controls-single-line, .input-wrapper') || $input.parent();
+                
+                $input.on('click', function(e) {
+                    const $ripple = $('<span class="ripple-effect"></span>');
+                    $wrapper.append($ripple);
+                    
+                    const rect = e.target.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    $ripple.css({
+                        width: size + 'px',
+                        height: size + 'px',
+                        left: x + 'px',
+                        top: y + 'px'
+                    });
+                    
+                    setTimeout(() => {
+                        $ripple.remove();
+                    }, 600);
+                });
+            });
+        }
+        
+        // Function to position calendar below the clicked input
+        function positionCalendarBelowInput($input) {
+            const $calendar = $('jdp-container');
+            if ($calendar.length > 0 && $input && $input.length > 0) {
+                const inputOffset = $input.offset();
+                const inputHeight = $input.outerHeight();
+                const inputWidth = $input.outerWidth();
+                
+                // Position calendar
+                $calendar.css({
+                    'position': 'absolute',
+                    'top': (inputOffset.top + inputHeight + 4) + 'px',
+                    'left': inputOffset.left + 'px',
+                    'z-index': '10002',
+                    'min-width': Math.max(inputWidth, 300) + 'px'
+                });
+            }
+        }
+        
+        // Observer to monitor calendar creation and reposition it
+        let currentActiveInput = null;
+        
+        // Store reference to clicked input
+        $(document).on('click', 'input[data-jdp]', function() {
+            currentActiveInput = $(this);
+        });
+        
+        // Monitor for calendar appearance
+        const calendarObserver = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.tagName === 'JDP-CONTAINER' || 
+                        (node.nodeType === 1 && $(node).find('jdp-container').length > 0)) {
+                        
+                        if (currentActiveInput) {
+                            // Quick positioning with minimal delay
+                            setTimeout(() => positionCalendarBelowInput(currentActiveInput), 10);
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Start observing
+        calendarObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Initialize calendar enhancements
+        $(document).ready(function() {
+            enhanceCalendarInputs();
+        });
+    });
+</script>
+{% endblock %}
