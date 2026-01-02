@@ -1,5 +1,13 @@
 # 🌺 Lotus - سیستم مدیریت و مانیتورینگ تلفن سانترال
 
+```
+    🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸
+    🌸    LOTUS PBX MANAGEMENT    🌸
+    🌸     🌺 🌺 🌺 🌺 🌺 🌺     🌸
+    🌸  مدیریت هوشمند تماس‌ها   🌸
+    🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸
+```
+
 <div align="center">
 
 ![Lotus Logo](https://img.shields.io/badge/Lotus-PBX%20Management-blue?style=for-the-badge&logo=django)
