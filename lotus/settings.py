@@ -17,7 +17,10 @@ from urllib.parse import urlparse
 
 # Try to load environment variables, but handle errors gracefully
 try:
-    load_dotenv()
+    try:
+        load_dotenv(encoding="utf-8")
+    except UnicodeDecodeError:
+        load_dotenv(encoding="utf-16")
 except Exception as e:
     print(f"Warning: Error loading .env file: {e}")
     # This allows the application to continue even if the .env file is missing or has issues
