@@ -15,81 +15,80 @@
         
     <!-- Password Reset Requests Section - Modern Design -->
     {% if password_reset_requests %}
-    <div style="margin-top:10px; margin-bottom: 1.5rem; position: relative; z-index: 100; overflow: hidden;" id="passwordResetRequestsCard">
-        <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-radius: 1rem 1rem 0 0;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fa-solid fa-key" style="color: #ffffff !important; font-size: 1.25rem;"></i>
+    <div class="userprofile-reset-card" id="passwordResetRequestsCard">
+        <div class="card-header userprofile-reset-card-header">
+            <div class="userprofile-reset-card-header-left">
+                <div class="userprofile-reset-card-icon-box">
+                    <i class="fa-solid fa-key userprofile-reset-card-icon"></i>
                 </div>
                 <div>
-                    <h2 style="margin: 0; font-size: 1.125rem; font-weight: 600; color: #ffffff !important; display: flex; align-items: center; gap: 0.5rem;">
+                    <h2 class="userprofile-reset-card-title">
                         درخواست‌های بازنشانی رمز عبور
-                        <span style="background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); color: #ffffff !important; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.875rem; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.3);">
+                        <span class="userprofile-reset-card-count">
                             {{ password_reset_requests|length }}
                         </span>
                     </h2>
-                    <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: rgba(255, 255, 255, 0.95) !important;">مدیریت درخواست‌های فراموشی رمز عبور کاربران</p>
+                    <p class="userprofile-reset-card-subtitle">مدیریت درخواست‌های فراموشی رمز عبور کاربران</p>
                 </div>
             </div>
-            <button type="button" id="toggleResetRequests" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 12px; width: 45px; height: 45px; color: #ffffff !important; cursor: pointer; font-size: 1.25rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center;" title="نمایش/مخفی کردن جزئیات" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='rotate(180deg)';" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='rotate(0deg)';">
-                <i class="fa-solid fa-chevron-down" style="color: #ffffff !important;"></i>
+            <button type="button" id="toggleResetRequests" class="userprofile-reset-toggle-btn" title="نمایش/مخفی کردن جزئیات" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='rotate(180deg)';" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='rotate(0deg)';">
+                <i class="fa-solid fa-chevron-down"></i>
             </button>
         </div>
         
-        <div id="resetRequestsContent" style="display: none; padding: 1.5rem; background: var(--card-bg);">
-            <div style="background: linear-gradient(135deg, rgba(103, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); border-right: 4px solid #667eea; border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
-                <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fa-solid fa-lightbulb" style="color: white; font-size: 1.125rem;"></i>
+        <div id="resetRequestsContent" class="userprofile-reset-card-content">
+            <div class="userprofile-reset-hint">
+                <div class="userprofile-reset-hint-icon">
+                    <i class="fa-solid fa-lightbulb"></i>
                 </div>
                 <div>
-                    <strong style="color: #667eea; font-size: 0.9375rem;">راهنما:</strong>
-                    <span style="color: var(--text-color); font-size: 0.9375rem;"> با کلیک روی دکمه "ریست پسورد"، رمز عبور کاربر به طور خودکار به <strong style="color: #667eea;">12345678</strong> تغییر می‌یابد.</span>
+                    <strong class="userprofile-reset-hint-label">راهنما:</strong>
+                    <span class="userprofile-reset-hint-text"> با کلیک روی دکمه "ریست پسورد"، رمز عبور کاربر به طور خودکار به <strong>12345678</strong> تغییر می‌یابد.</span>
                 </div>
             </div>
             
-            <div style="overflow-x: auto; border-radius: 1rem; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
-                <table style="width: 100%; border-collapse: collapse; background: var(--card-bg);">
+            <div class="userprofile-reset-table-wrap">
+                <table class="userprofile-reset-table">
                     <thead>
-                        <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;">
+                        <tr class="userprofile-reset-table-head-row">
                             <th class="reset-table-header">
-                                <i class="fa-solid fa-user" style="margin-left: 0.5rem; opacity: 0.9;"></i><span>نام کاربری</span>
+                                <i class="fa-solid fa-user userprofile-reset-table-icon"></i><span>نام کاربری</span>
                             </th>
                             <th class="reset-table-header">
-                                <i class="fa-solid fa-id-card" style="margin-left: 0.5rem; opacity: 0.9;"></i><span>نام و نام خانوادگی</span>
+                                <i class="fa-solid fa-id-card userprofile-reset-table-icon"></i><span>نام و نام خانوادگی</span>
                             </th>
                             <th class="reset-table-header">
-                                <i class="fa-solid fa-calendar-alt" style="margin-left: 0.5rem; opacity: 0.9;"></i><span>تاریخ درخواست</span>
+                                <i class="fa-solid fa-calendar-alt userprofile-reset-table-icon"></i><span>تاریخ درخواست</span>
                             </th>
-                            <th class="reset-table-header" style="text-align: center;">
-                                <i class="fa-solid fa-cog" style="margin-left: 0.5rem; opacity: 0.9;"></i><span>عملیات</span>
+                            <th class="reset-table-header userprofile-reset-table-th-center">
+                                <i class="fa-solid fa-cog userprofile-reset-table-icon"></i><span>عملیات</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for request in password_reset_requests %}
-                        <tr class="table-row-hover" style="border-bottom: 1px solid var(--border-color); transition: all 0.2s ease; position: relative;">
-                            <td style="padding: 1.25rem; color: var(--text-color); font-weight: 600; font-size: 0.9375rem;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i class="fa-solid fa-user" style="color: white; font-size: 0.875rem;"></i>
+                        <tr class="table-row-hover userprofile-reset-table-row">
+                            <td class="userprofile-reset-td-main">
+                                <div class="userprofile-reset-user-cell">
+                                    <div class="userprofile-reset-user-avatar">
+                                        <i class="fa-solid fa-user"></i>
                                     </div>
-                                    <span style="color: #667eea; font-weight: 600;">{{ request.user.username }}</span>
+                                    <span class="userprofile-reset-username">{{ request.user.username }}</span>
                                 </div>
                             </td>
-                            <td style="padding: 1.25rem; color: var(--text-color); font-size: 0.9375rem;">
+                            <td class="userprofile-reset-td">
                                 {{ request.user.name }} {{ request.user.lastname }}
                             </td>
-                            <td style="padding: 1.25rem; color: var(--light-text); font-size: 0.875rem;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <i class="fa-solid fa-clock" style="color: #667eea;"></i>
+                            <td class="userprofile-reset-td-muted">
+                                <div class="userprofile-reset-date-cell">
+                                    <i class="fa-solid fa-clock"></i>
                                     <span>{{ request.created_at|date:"Y/m/d H:i" }}</span>
                                 </div>
                             </td>
-                            <td style="padding: 1.25rem; text-align: center;">
-                                <button type="button" class="reset-password-btn" 
+                            <td class="userprofile-reset-td-center">
+                                <button type="button" class="reset-password-btn userprofile-reset-btn" 
                                         data-username="{{ request.user.username }}" 
                                         data-request-id="{{ request.id }}"
-                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.625rem 1.25rem; border-radius: 0.75rem; border: none; cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25); display: inline-flex; align-items: center; gap: 0.5rem;"
                                         onmouseover="this.style.boxShadow='0 8px 12px rgba(102, 126, 234, 0.35)'; this.style.background='linear-gradient(135deg, #764ba2 0%, #667eea 100%)';"
                                         onmouseout="this.style.boxShadow='0 4px 6px rgba(102, 126, 234, 0.25)'; this.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';">
                                     <i class="fa-solid fa-key"></i>
@@ -164,8 +163,8 @@
             </div>
             
             <!-- Required fields notice -->
-            <div class="form-section" id="required-fields-notice" style="padding: 10px 20px; background-color: rgba(255, 0, 0, 0.1); border-right: 4px solid red; margin-bottom: 20px;">
-                <p><i class="fa-solid fa-info-circle"></i> فیلدهای مشخص شده با <span style="color: red; font-weight: bold; font-size: 18px;">*</span> برای اضافه کردن کاربر جدید الزامی هستند.</p>
+            <div class="form-section userprofile-required-fields-notice" id="required-fields-notice">
+                <p><i class="fa-solid fa-info-circle"></i> فیلدهای مشخص شده با <span class="userprofile-required-fields-asterisk">*</span> برای اضافه کردن کاربر جدید الزامی هستند.</p>
             </div>
             
             <!-- Basic Information Section -->
@@ -181,7 +180,7 @@
                     <div class="form-group">
                         <label class="form-label" for="id_username">نام کاربری:</label>
                         {{ userform.username }}
-                        <div class="field-error" id="username-error" style="display: none; color: red; font-size: 12px; margin-top: 4px;">لطفا نام کاربری را وارد کنید</div>
+                        <div class="field-error userprofile-field-error" id="username-error">لطفا نام کاربری را وارد کنید</div>
                     </div>
                     
                     <div class="form-group">
@@ -203,7 +202,7 @@
                     <div class="form-group">
                         <label class="form-label" for="id_extension">داخلی:</label>
                         {{ userform.extension }}
-                        <div class="field-error" id="extension-error" style="display: none; color: red; font-size: 12px; margin-top: 4px;">لطفا داخلی را وارد کنید</div>
+                        <div class="field-error userprofile-field-error" id="extension-error">لطفا داخلی را وارد کنید</div>
                     </div>
                     
                     <div class="form-group">
@@ -215,7 +214,7 @@
                     <div class="form-group">
                         <label class="form-label" id="id_label_groupname">نقش:</label>
                         {{ userform.groupname }}
-                        <div class="field-error" id="role-error" style="display: none; color: red; font-size: 12px; margin-top: 4px;">لطفا نقش را انتخاب کنید</div>
+                        <div class="field-error userprofile-field-error" id="role-error">لطفا نقش را انتخاب کنید</div>
                     </div>
                 </div>
             </div>
@@ -327,7 +326,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="field-error" id="extensions-error" style="display: none; color: red; font-size: 12px; margin-top: 4px;">لطفا دسترسی به داخلی را انتخاب کنید</div>
+                        <div class="field-error userprofile-field-error" id="extensions-error">لطفا دسترسی به داخلی را انتخاب کنید</div>
                     </div>
                     
                     <div class="form-group">
@@ -356,7 +355,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="field-error" id="permissions-error" style="display: none; color: red; font-size: 12px; margin-top: 4px;">لطفا سطح دسترسی را انتخاب کنید</div>
+                        <div class="field-error userprofile-field-error" id="permissions-error">لطفا سطح دسترسی را انتخاب کنید</div>
                     </div>
                     
                     <div class="form-group">
